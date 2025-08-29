@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- <link rel="icon" href="./favicon.ico" /> -->
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-B2ootaw-.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-CxL0S8W7.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-D9fedIX3.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-BTCkDNvf.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-DU3aDxX5.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-CLVRCuM9.ttf" as="font" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        var scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          var element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          var hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          var newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((entries) => {
+          setHeight();
+        });
+        resizeObserver.observe(obj.contentWindow.document.body);
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>Enrollment by Gender</title>
+    <script type="module" crossorigin src="./assets/index-DYmhnlX1.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-S3mjG3Uz.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    <marimo-code hidden="">import%20marimo%0A%0A__generated_with%20%3D%20%220.14.12%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%23%20Yale%20School%20by%20Gender%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20%23%20TODO%0A%20%20%20%20%23%20add%20Total%20University%0A%20%20%20%20%23%20fix%20tooltips%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20import%20polars%20as%20pl%0A%20%20%20%20import%20altair%20as%20alt%0A%20%20%20%20return%20alt%2C%20mo%2C%20pl%0A%0A%0A%40app.cell%0Adef%20_(mo%2C%20pl)%3A%0A%20%20%20%20dataLoc%20%3D%20mo.notebook_location()%20%2F%20%22public%22%20%2F%20%22w010-yale-school-gender.csv%22%0A%20%20%20%20df%20%3D%20pl.read_csv(str(dataLoc))%0A%20%20%20%20longDat%20%3D%20df.unpivot(index%20%3D%20%5B%22Year%22%2C%20%22School%22%5D%2C%20variable_name%3D%22Gender%22%2C%20value_name%3D%22Count%22)%0A%20%20%20%20longDat%20%3D%20longDat.fill_null('0').with_columns(pl.col('Count').cast(pl.UInt64))%0A%20%20%20%20gender_enum%20%3D%20pl.Enum(%5B%22M%22%2C%22W%22%2C%22N%20or%20Unknown%22%5D)%0A%20%20%20%20longDat%20%3D%20longDat.with_columns(pl.col(%22Gender%22).cast(gender_enum))%0A%20%20%20%20return%20(longDat%2C)%0A%0A%0A%40app.cell%0Adef%20_(longDat)%3A%0A%20%20%20%20yrs%20%3D%20longDat.get_column(%22Year%22).unique().sort(descending%3DTrue).to_list()%0A%20%20%20%20return%20(yrs%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo%2C%20yrs)%3A%0A%20%20%20%20y%20%3D%20mo.ui.dropdown(options%3Dyrs%2C%20value%3D2024)%0A%20%20%20%20y%0A%20%20%20%20return%20(y%2C)%0A%0A%0A%40app.cell%0Adef%20_(longDat%2C%20pl%2C%20y)%3A%0A%20%20%20%20yrDat%20%3D%20longDat.filter(pl.col('Year')%20%3D%3D%20y.value)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(alt%2C%20longDat%2C%20mo%2C%20y)%3A%0A%20%20%20%20gender_order%20%3D%20%5B%22M%22%2C%22W%22%2C%22N%20or%20Unknown%22%5D%0A%0A%20%20%20%20yrChart%20%3D%20mo.ui.altair_chart(%0A%20%20%20%20%20%20%20%20alt.Chart(longDat).mark_bar().encode(%0A%20%20%20%20%20%20%20%20%20%20%20%20x%3Dalt.X('sum(Count)'%2C%20stack%3D'normalize'%2C%20title%3D'')%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20y%3Dalt.Y('School%3AN'%2C%20title%3D'')%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3Dalt.Color(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20'Gender%3AN'%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20scale%3Dalt.Scale(range%3D%5B'%2300356B'%2C'%2363aaff'%2C'%23286dc0'%5D)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20sort%3Dgender_order%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20order%3D'order%3AO'%0A%20%20%20%20%20%20%20%20).properties(title%3Df'Gender%20Percentages%20by%20School%2C%20%7By.value%7D')%0A%20%20%20%20)%0A%0A%20%20%20%20yrChart%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(longDat)%3A%0A%20%20%20%20opts%20%3D%20longDat.get_column(%22School%22).unique().to_list()%0A%20%20%20%20return%20(opts%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo%2C%20opts)%3A%0A%20%20%20%20x%20%3D%20mo.ui.dropdown(options%3Dopts%2C%20value%3D%22Yale%20College%22)%0A%20%20%20%20x%0A%20%20%20%20return%20(x%2C)%0A%0A%0A%40app.cell%0Adef%20_(longDat%2C%20pl%2C%20x)%3A%0A%20%20%20%20selectedDat%20%3D%20longDat.filter(pl.col('School')%20%3D%3D%20x.value)%0A%20%20%20%20return%20(selectedDat%2C)%0A%0A%0A%40app.cell%0Adef%20_(alt%2C%20mo%2C%20selectedDat%2C%20x)%3A%0A%20%20%20%20chart%20%3D%20mo.ui.altair_chart(alt.Chart(selectedDat).mark_bar().encode(%0A%20%20%20%20%20%20%20%20x%3Dalt.X('Year%3AO').title('')%2C%0A%20%20%20%20%20%20%20%20y%3Dalt.Y('Count%3AQ').title('')%2C%0A%20%20%20%20%20%20%20%20color%20%3D%20alt.Color('Gender'%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20scale%20%3D%20alt.Scale(range%3D%5B'%2300356B'%2C'%2363aaff'%2C'%23286dc0'%5D))%2C%0A%20%20%20%20%20%20%20%20order%3D'order%3AO'%0A%20%20%20%20).properties(title%3Df'Gender%20Headcounts%3A%20%7Bx.value%7D'))%0A%0A%20%20%20%20chart%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <!-- This is a portal for the data editor to render in -->
+    <div id="portal" data-testid="glide-portal" style="position: fixed; left: 0; top: 0; z-index: 9999"></div>
+    <script data-marimo="true">
+      window.__MARIMO_MOUNT_CONFIG__ = {
+            "filename": "notebook.py",
+            "mode": "read",
+            "version": "0.14.12",
+            "serverToken": "unused",
+            "config": {"completion": {"activate_on_typing": true, "copilot": false}, "display": {"cell_output": "above", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": false, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": true}}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": true, "auto_reload": "off", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        };
+    </script>
+  </body>
+</html>
